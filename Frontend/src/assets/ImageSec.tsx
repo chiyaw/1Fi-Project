@@ -1,19 +1,33 @@
+import { useState } from 'react';
 import image from '../assets/image.png'
 
 function ImageSec() {
+    const storageOptions = ['128GB', '256GB', '512GB'];
+    const [selectedStorage, setSelectedStorage] = useState(storageOptions[0]);
+
     return (
         <>
             <div className='flex flex-col lg:flex-row p-4 sm:p-6 md:p-8 gap-4 sm:gap-5 md:gap-6 w-full max-w-screen-2xl mx-auto h-screen'>
-                <div className='flex flex-col justify-between rounded-lg border-2 border-black p-4 sm:p-6 text-black w-full lg:w-2/3 bg-white shadow-lg'>
+                <div className='flex flex-col justify-between rounded-lg border-2 border-gray p-4 sm:p-6 text-black w-full lg:w-2/3 bg-white shadow-lg'>
                     <div className='flex flex-row justify-between items-center mb-4'>
                         <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold'>Product Name</h1>
-                        <p className='px-3 py-2 bg-orange-300 rounded-md text-sm sm:text-base font-medium whitespace-nowrap'>Variant Storage</p>
+                        <select
+                            value={selectedStorage}
+                            onChange={(e) => setSelectedStorage(e.target.value)}
+                            className='px-3 py-2 bg-gray-300 rounded-md text-sm sm:text-base font-medium whitespace-nowrap cursor-pointer border-2 border-gray-400 hover:bg-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500'
+                        >
+                            {storageOptions.map((storage) => (
+                                <option key={storage} value={storage} className='bg-white text-black'>
+                                    {storage}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div className='mb-4 flex items-center justify-center rounded-lg p-4 overflow-hidden'>
                         <img
                             src={image}
                             alt="Product Image"
-                            className='w-full max-w-2xl h-[400px] sm:h-[450px] md:h-[500px] object-contain hover:scale-105 transition-transform duration-300'
+                            className='w-full max-w-2xl h-screen sm:h-[450px] md:h-[500px] object-contain hover:scale-105 transition-transform duration-300'
                         />
                     </div>
                     <div className='text-base sm:text-lg font-medium text-center'>
