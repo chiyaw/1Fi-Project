@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { Product } from '../types/index';
 import { getProducts } from '../services/api';
+import { UI_MESSAGES, LOCALE } from '../constant';
 
 function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -17,7 +18,7 @@ function ProductList() {
         setProducts(data);
         setError(null);
       } catch (err) {
-        setError('Failed to load products');
+        setError(UI_MESSAGES.ERROR.FAILED_LOAD_PRODUCTS);
         console.error('Error fetching products:', err);
       } finally {
         setLoading(false);
@@ -69,13 +70,13 @@ function ProductList() {
             <p className={`text-xs ${
               productId === product._id ? 'text-blue-50' : 'text-gray-500'
             }`}>
-              From ₹{product.variants[0]?.price.toLocaleString('en-IN')}
+              From ₹{product.variants[0]?.price.toLocaleString(LOCALE)}
             </p>
           </Link>
         ))}
       </div>
       {products.length === 0 && (
-        <p className="text-sm text-gray-500 mt-4">No products available</p>
+        <p className="text-sm text-gray-500 mt-4">{UI_MESSAGES.PRODUCT.NO_PRODUCTS}</p>
       )}
     </div>
   );

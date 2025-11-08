@@ -4,24 +4,34 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import productRoutes from './routes/productRoutes.js';
 import detect from "detect-port";
+import {
+  DEFAULT_PORT,
+  CORS_ORIGINS,
+  CORS_METHODS,
+  CORS_ALLOWED_HEADERS,
+  SERVER_NAME,
+  API_VERSION,
+  API_ENDPOINTS,
+  RESPONSE_MESSAGES,
+  HTTP_STATUS
+} from './constant.js';
 
 // Load environment variables
 dotenv.config();
 
 // Initialize Express app
 const app = express();
-const DEFAULT_PORT = parseInt(process.env.PORT) || 5000;
-const PORT = await detect(DEFAULT_PORT);
+const PORT = await detect(parseInt(process.env.PORT) || DEFAULT_PORT);
 
 // Connect to MongoDB
 connectDB();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'], // Allow frontend origins
+  origin: CORS_ORIGINS, // Allow frontend origins
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: CORS_METHODS,
+  allowedHeaders: CORS_ALLOWED_HEADERS
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,11 +46,9 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: '1Fi Backend API',
-    version: '1.0.0',
-    endpoints: {
-      products: '/api/products'
-    }
+    message: SERVER_NAME,
+    version: API_VERSION,
+    endpoints: API_ENDPOINTS
   });
 });
 
@@ -48,18 +56,18 @@ app.use('/api/products', productRoutes);
 
 // 404 Handler
 app.use((req, res) => {
-  res.status(404).json({
+  res.status(HTTP_STATUS.NOT_FOUND).json({
     success: false,
-    message: 'Route not found'
+    message: RESPONSE_MESSAGES.ROUTE_NOT_FOUND
   });
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({
+  res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
     success: false,
-    message: 'Internal server error',
+    message: RESPONSE_MESSAGES.INTERNAL_SERVER_ERROR,
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });

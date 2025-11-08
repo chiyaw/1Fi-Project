@@ -1,11 +1,5 @@
 import { useMemo } from 'react';
-
-interface EMIPlan {
-  id: string;
-  tenureMonths: number;
-  interestRate: number;
-  cashback: number;
-}
+import { EMI_PLANS, MONTHS_PER_YEAR, PERCENTAGE_DIVISOR, LOCALE, INTEREST_RATE_DISPLAY, type EMIPlan } from '../constant';
 
 interface EMIPlanSelectorProps {
   productPrice: number;
@@ -14,16 +8,8 @@ interface EMIPlanSelectorProps {
 }
 
 function EMIPlanSelector({ productPrice, onSelectPlan, selectedPlan }: EMIPlanSelectorProps) {
-  // Define the 7 EMI plans
-  const emiPlans: EMIPlan[] = useMemo(() => [
-    { id: '1', tenureMonths: 3, interestRate: 0, cashback: 0 },
-    { id: '2', tenureMonths: 6, interestRate: 0, cashback: 0 },
-    { id: '3', tenureMonths: 12, interestRate: 0, cashback: 0 },
-    { id: '4', tenureMonths: 24, interestRate: 0, cashback: 0 },
-    { id: '5', tenureMonths: 36, interestRate: 10.5, cashback: 0 },
-    { id: '6', tenureMonths: 48, interestRate: 10.5, cashback: 0 },
-    { id: '7', tenureMonths: 60, interestRate: 10.5, cashback: 0 },
-  ], []);
+  // Use EMI plans from constants
+  const emiPlans: EMIPlan[] = useMemo(() => EMI_PLANS, []);
 
   const calculateMonthlyPayment = (plan: EMIPlan): number => {
     const principal = productPrice - plan.cashback;
@@ -35,7 +21,7 @@ function EMIPlanSelector({ productPrice, onSelectPlan, selectedPlan }: EMIPlanSe
 
     // For interest-based plans: use EMI formula
     // EMI = [P × r × (1+r)^n] / [(1+r)^n-1]
-    const monthlyInterestRate = plan.interestRate / 100 / 12;
+    const monthlyInterestRate = plan.interestRate / PERCENTAGE_DIVISOR / MONTHS_PER_YEAR;
     const n = plan.tenureMonths;
     
     const emi =
@@ -61,7 +47,7 @@ function EMIPlanSelector({ productPrice, onSelectPlan, selectedPlan }: EMIPlanSe
           <div
             key={plan.id}
             onClick={() => onSelectPlan(isSelected ? null : plan)}
-            className={`px-3 py-3 border rounded-md transition-all cursor-pointer ${
+            className={`px-1 py-1 border rounded-md transition-all cursor-pointer ${
               isSelected
                 ? 'border-blue-500 bg-blue-50 shadow-md'
                 : 'border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400'
@@ -80,21 +66,21 @@ function EMIPlanSelector({ productPrice, onSelectPlan, selectedPlan }: EMIPlanSe
                     <div className="w-2 h-2 bg-white rounded-full"></div>
                   )}
                 </div>
-                <p className="font-medium">₹{monthlyPayment.toLocaleString('en-IN')} ✕ {plan.tenureMonths} Months</p>
+                <p className="font-medium">₹{monthlyPayment.toLocaleString(LOCALE)} ✕ {plan.tenureMonths} Months</p>
               </div>
               <p className={`text-sm font-semibold ${
                 plan.interestRate === 0 ? 'text-green-600' : 'text-orange-600'
               }`}>
-                {plan.interestRate === 0 ? '0% Interest' : `${plan.interestRate}% Interest`}
+                {plan.interestRate === 0 ? INTEREST_RATE_DISPLAY.ZERO_INTEREST : INTEREST_RATE_DISPLAY.WITH_INTEREST(plan.interestRate)}
               </p>
             </div>
             <div className="ml-6">
-              <p className="text-xs text-gray-500 mt-1">
-                Total: ₹{totalAmount.toLocaleString('en-IN')}
+              <p className="text-xs text-gray-500">
+                Total: ₹{totalAmount.toLocaleString(LOCALE)}
               </p>
               {plan.cashback > 0 && (
-                <p className="text-xs text-green-600 mt-1">
-                  Cashback: ₹{plan.cashback.toLocaleString('en-IN')}
+                <p className="text-xs text-green-600">
+                  Additional Cashback: ₹{plan.cashback.toLocaleString(LOCALE)}
                 </p>
               )}
             </div>

@@ -1,5 +1,6 @@
 import express from 'express';
 import Product from '../models/Product.js';
+import { HTTP_STATUS, RESPONSE_MESSAGES } from '../constant.js';
 
 const router = express.Router();
 
@@ -13,9 +14,9 @@ router.get('/', async (req, res) => {
       data: products
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: 'Error fetching products',
+      message: RESPONSE_MESSAGES.ERROR_FETCHING_PRODUCTS,
       error: error.message
     });
   }
@@ -27,9 +28,9 @@ router.get('/:id', async (req, res) => {
     const product = await Product.findById(req.params.id);
     
     if (!product) {
-      return res.status(404).json({
+      return res.status(HTTP_STATUS.NOT_FOUND).json({
         success: false,
-        message: 'Product not found'
+        message: RESPONSE_MESSAGES.PRODUCT_NOT_FOUND
       });
     }
     
@@ -38,9 +39,9 @@ router.get('/:id', async (req, res) => {
       data: product
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: 'Error fetching product',
+      message: RESPONSE_MESSAGES.ERROR_FETCHING_PRODUCT,
       error: error.message
     });
   }

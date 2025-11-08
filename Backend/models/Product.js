@@ -1,4 +1,12 @@
 import mongoose from 'mongoose';
+import {
+  PRODUCT_CATEGORIES,
+  VALIDATION,
+  VALIDATION_MESSAGES,
+  SCHEMA_CONFIG,
+  IMAGE_URL_PATTERN,
+  DEFAULTS
+} from '../constant.js';
 
 /**
  * Variant Schema - Represents different product configurations (color + storage combinations)
@@ -6,59 +14,59 @@ import mongoose from 'mongoose';
 const variantSchema = new mongoose.Schema({
   storage: {
     type: [String],
-    required: [true, 'Storage configuration is required'],
+    required: [true, VALIDATION_MESSAGES.VARIANT.STORAGE_REQUIRED],
     validate: {
       validator: function(v) {
         return v && v.length > 0;
       },
-      message: 'Storage must have at least one value'
+      message: VALIDATION_MESSAGES.VARIANT.STORAGE_MIN
     }
   },
   color: {
     type: String,
-    required: [true, 'Color is required'],
+    required: [true, VALIDATION_MESSAGES.VARIANT.COLOR_REQUIRED],
     trim: true,
-    minlength: [2, 'Color name must be at least 2 characters'],
-    maxlength: [50, 'Color name cannot exceed 50 characters']
+    minlength: [VALIDATION.VARIANT.COLOR_MIN_LENGTH, VALIDATION_MESSAGES.VARIANT.COLOR_MIN_LENGTH],
+    maxlength: [VALIDATION.VARIANT.COLOR_MAX_LENGTH, VALIDATION_MESSAGES.VARIANT.COLOR_MAX_LENGTH]
   },
   mrp: {
     type: Number,
-    required: [true, 'MRP is required'],
-    min: [0, 'MRP cannot be negative'],
+    required: [true, VALIDATION_MESSAGES.VARIANT.MRP_REQUIRED],
+    min: [VALIDATION.VARIANT.MIN_PRICE, VALIDATION_MESSAGES.VARIANT.MRP_MIN],
     validate: {
       validator: Number.isFinite,
-      message: 'MRP must be a valid number'
+      message: VALIDATION_MESSAGES.VARIANT.MRP_VALID
     }
   },
   price: {
     type: Number,
-    required: [true, 'Price is required'],
-    min: [0, 'Price cannot be negative'],
+    required: [true, VALIDATION_MESSAGES.VARIANT.PRICE_REQUIRED],
+    min: [VALIDATION.VARIANT.MIN_PRICE, VALIDATION_MESSAGES.VARIANT.PRICE_MIN],
     validate: {
       validator: Number.isFinite,
-      message: 'Price must be a valid number'
+      message: VALIDATION_MESSAGES.VARIANT.PRICE_VALID
     }
   },
   imageUrl: {
     type: String,
-    required: [true, 'Image URL is required'],
+    required: [true, VALIDATION_MESSAGES.VARIANT.IMAGE_URL_REQUIRED],
     trim: true,
     validate: {
       validator: function(v) {
-        return /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/i.test(v) || v.startsWith('data:image');
+        return IMAGE_URL_PATTERN.test(v) || v.startsWith('data:image');
       },
-      message: 'Invalid image URL format'
+      message: VALIDATION_MESSAGES.VARIANT.IMAGE_URL_INVALID
     }
   },
   inStock: {
     type: Boolean,
-    default: true,
+    default: DEFAULTS.IN_STOCK,
     index: true
   },
   stockQuantity: {
     type: Number,
-    default: 0,
-    min: [0, 'Stock quantity cannot be negative']
+    default: DEFAULTS.STOCK_QUANTITY,
+    min: [VALIDATION.VARIANT.MIN_STOCK, VALIDATION_MESSAGES.VARIANT.STOCK_MIN]
   }
 }, {
   _id: true,
@@ -79,36 +87,36 @@ variantSchema.virtual('discountPercentage').get(function() {
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Product name is required'],
+    required: [true, VALIDATION_MESSAGES.PRODUCT.NAME_REQUIRED],
     trim: true,
-    minlength: [3, 'Product name must be at least 3 characters'],
-    maxlength: [200, 'Product name cannot exceed 200 characters'],
+    minlength: [VALIDATION.PRODUCT.NAME_MIN_LENGTH, VALIDATION_MESSAGES.PRODUCT.NAME_MIN_LENGTH],
+    maxlength: [VALIDATION.PRODUCT.NAME_MAX_LENGTH, VALIDATION_MESSAGES.PRODUCT.NAME_MAX_LENGTH],
     index: true
   },
   description: {
     type: String,
-    required: [true, 'Product description is required'],
+    required: [true, VALIDATION_MESSAGES.PRODUCT.DESCRIPTION_REQUIRED],
     trim: true,
-    minlength: [10, 'Description must be at least 10 characters'],
-    maxlength: [2000, 'Description cannot exceed 2000 characters']
+    minlength: [VALIDATION.PRODUCT.DESCRIPTION_MIN_LENGTH, VALIDATION_MESSAGES.PRODUCT.DESCRIPTION_MIN_LENGTH],
+    maxlength: [VALIDATION.PRODUCT.DESCRIPTION_MAX_LENGTH, VALIDATION_MESSAGES.PRODUCT.DESCRIPTION_MAX_LENGTH]
   },
   category: {
     type: String,
-    required: [true, 'Category is required'],
+    required: [true, VALIDATION_MESSAGES.PRODUCT.CATEGORY_REQUIRED],
     trim: true,
     lowercase: true,
     enum: {
-      values: ['smartphone', 'laptop', 'tablet', 'smartwatch', 'earbuds', 'accessories', 'other'],
-      message: '{VALUE} is not a supported category'
+      values: PRODUCT_CATEGORIES,
+      message: VALIDATION_MESSAGES.PRODUCT.CATEGORY_INVALID
     },
     index: true
   },
   brand: {
     type: String,
-    required: [true, 'Brand is required'],
+    required: [true, VALIDATION_MESSAGES.PRODUCT.BRAND_REQUIRED],
     trim: true,
-    minlength: [2, 'Brand name must be at least 2 characters'],
-    maxlength: [100, 'Brand name cannot exceed 100 characters'],
+    minlength: [VALIDATION.PRODUCT.BRAND_MIN_LENGTH, VALIDATION_MESSAGES.PRODUCT.BRAND_MIN_LENGTH],
+    maxlength: [VALIDATION.PRODUCT.BRAND_MAX_LENGTH, VALIDATION_MESSAGES.PRODUCT.BRAND_MAX_LENGTH],
     index: true
   },
   storageOptions: [{
@@ -123,12 +131,12 @@ const productSchema = new mongoose.Schema({
   }],
   variants: {
     type: [variantSchema],
-    required: [true, 'At least one variant is required'],
+    required: [true, VALIDATION_MESSAGES.PRODUCT.VARIANTS_REQUIRED],
     validate: {
       validator: function(v) {
         return v && v.length > 0;
       },
-      message: 'Product must have at least one variant'
+      message: VALIDATION_MESSAGES.PRODUCT.VARIANTS_MIN
     }
   },
   defaultVariant: {
@@ -144,25 +152,25 @@ const productSchema = new mongoose.Schema({
   },
   featured: {
     type: Boolean,
-    default: false,
+    default: DEFAULTS.FEATURED,
     index: true
   },
   active: {
     type: Boolean,
-    default: true,
+    default: DEFAULTS.ACTIVE,
     index: true
   },
   rating: {
     average: {
       type: Number,
-      default: 0,
-      min: [0, 'Rating cannot be less than 0'],
-      max: [5, 'Rating cannot be more than 5']
+      default: DEFAULTS.RATING_AVERAGE,
+      min: [VALIDATION.RATING.MIN, VALIDATION_MESSAGES.RATING.MIN],
+      max: [VALIDATION.RATING.MAX, VALIDATION_MESSAGES.RATING.MAX]
     },
     count: {
       type: Number,
-      default: 0,
-      min: [0, 'Rating count cannot be negative']
+      default: DEFAULTS.RATING_COUNT,
+      min: [VALIDATION.VARIANT.MIN_STOCK, VALIDATION_MESSAGES.RATING.COUNT_MIN]
     }
   },
   specifications: {
@@ -176,10 +184,10 @@ const productSchema = new mongoose.Schema({
     lowercase: true
   }]
 }, {
-  timestamps: true,
-  collection: 'ProductInfo',
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
+  timestamps: SCHEMA_CONFIG.TIMESTAMPS,
+  collection: SCHEMA_CONFIG.COLLECTION_NAME,
+  toJSON: { virtuals: SCHEMA_CONFIG.VIRTUALS },
+  toObject: { virtuals: SCHEMA_CONFIG.VIRTUALS }
 });
 
 // Indexes for better query performance

@@ -3,13 +3,17 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import type { Product, Variant } from '../types/index';
 import { getProductById } from '../services/api';
 import EMIPlanSelector from './EMIPlanSelector';
-
-interface EMIPlan {
-  id: string;
-  tenureMonths: number;
-  interestRate: number;
-  cashback: number;
-}
+import {
+  UI_MESSAGES,
+  COLOR_LUMINANCE_THRESHOLD,
+  COLOR_LUMINANCE_WEIGHTS,
+  LOCALE,
+  INTEREST_RATE_DISPLAY,
+  IMAGE_FALLBACK,
+  MONTHS_PER_YEAR,
+  PERCENTAGE_DIVISOR,
+  type EMIPlan
+} from '../constant';
 
 function ProductDetail() {
   const { productId } = useParams<{ productId: string }>();
@@ -27,7 +31,7 @@ function ProductDetail() {
   useEffect(() => {
     const fetchProduct = async () => {
       if (!productId) {
-        setError('No product ID provided');
+        setError(UI_MESSAGES.ERROR.NO_PRODUCT_ID);
         setLoading(false);
         return;
       }
@@ -39,7 +43,7 @@ function ProductDetail() {
         // Check if product has variants
         if (!data.variants || data.variants.length === 0) {
           console.error('Product has no variants!');
-          setError('Product has no variants available');
+          setError(UI_MESSAGES.ERROR.NO_VARIANTS);
           setLoading(false);
           return;
         }
@@ -100,7 +104,7 @@ function ProductDetail() {
         setError(null);
         setIsInitialLoad(false); // Mark initial load as complete
       } catch (err) {
-        setError('Failed to load product');
+        setError(UI_MESSAGES.ERROR.FAILED_LOAD_PRODUCT);
         console.error('Error fetching product:', err);
       } finally {
         setLoading(false);
@@ -143,13 +147,13 @@ function ProductDetail() {
 
   const handleProceed = () => {
     if (!selectedPlan || !currentVariant) {
-      alert('Please select an EMI plan to proceed');
+      alert(UI_MESSAGES.PRODUCT.SELECT_EMI_PLAN);
       return;
     }
 
     // Calculate EMI details
     const principal = currentVariant.price - selectedPlan.cashback;
-    const monthlyInterestRate = selectedPlan.interestRate / 100 / 12;
+    const monthlyInterestRate = selectedPlan.interestRate / PERCENTAGE_DIVISOR / MONTHS_PER_YEAR;
 
     let monthlyPayment: number;
     if (selectedPlan.interestRate === 0) {
@@ -162,18 +166,18 @@ function ProductDetail() {
     }
 
     const interestDisplay = selectedPlan.interestRate === 0 
-      ? '0% Interest' 
-      : `${selectedPlan.interestRate}% Interest`;
+      ? INTEREST_RATE_DISPLAY.ZERO_INTEREST
+      : INTEREST_RATE_DISPLAY.WITH_INTEREST(selectedPlan.interestRate);
 
     alert(
       `Proceeding with:\n\n` +
       `Product: ${product?.name}\n` +
       `Variant: ${selectedStorage} - ${selectedColor}\n` +
-      `Price: ₹${currentVariant.price.toLocaleString('en-IN')}\n\n` +
+      `Price: ₹${currentVariant.price.toLocaleString(LOCALE)}\n\n` +
       `EMI Plan: ${selectedPlan.tenureMonths} months @ ${interestDisplay}\n` +
-      `Monthly Payment: ₹${monthlyPayment.toLocaleString('en-IN')}\n` +
-      `Total Amount: ₹${(monthlyPayment * selectedPlan.tenureMonths).toLocaleString('en-IN')}\n` +
-      (selectedPlan.cashback > 0 ? `Cashback: ₹${selectedPlan.cashback.toLocaleString('en-IN')}\n\n` : '\n') +
+      `Monthly Payment: ₹${monthlyPayment.toLocaleString(LOCALE)}\n` +
+      `Total Amount: ₹${(monthlyPayment * selectedPlan.tenureMonths).toLocaleString(LOCALE)}\n` +
+      (selectedPlan.cashback > 0 ? `Cashback: ₹${selectedPlan.cashback.toLocaleString(LOCALE)}\n\n` : '\n') +
       `This would proceed to checkout in a real application.`
     );
   };
@@ -183,7 +187,7 @@ function ProductDetail() {
       <div className="flex-1 flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading product...</p>
+          <p className="mt-4 text-gray-600">{UI_MESSAGES.LOADING.PRODUCT}</p>
         </div>
       </div>
     );
@@ -193,12 +197,12 @@ function ProductDetail() {
     return (
       <div className="flex-1 flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-600 text-lg">{error || 'Product not found'}</p>
+          <p className="text-red-600 text-lg">{error || UI_MESSAGES.ERROR.PRODUCT_NOT_FOUND}</p>
           <button
             onClick={() => navigate('/')}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
-            Go Back
+            {UI_MESSAGES.PRODUCT.GO_BACK}
           </button>
         </div>
       </div>
@@ -209,12 +213,12 @@ function ProductDetail() {
     return (
       <div className="flex-1 flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-600 text-lg">No variants available for this product</p>
+          <p className="text-red-600 text-lg">{UI_MESSAGES.ERROR.NO_VARIANTS_AVAILABLE}</p>
           <button
             onClick={() => navigate('/')}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
-            Go Back
+            {UI_MESSAGES.PRODUCT.GO_BACK}
           </button>
         </div>
       </div>
@@ -237,10 +241,10 @@ function ProductDetail() {
     const b = parseInt(hex.substring(4, 6), 16);
     
     // Calculate luminance (perceived brightness)
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    const luminance = (COLOR_LUMINANCE_WEIGHTS.RED * r + COLOR_LUMINANCE_WEIGHTS.GREEN * g + COLOR_LUMINANCE_WEIGHTS.BLUE * b) / 255;
     
-    // Return true if luminance is greater than 0.5 (light color)
-    return luminance > 0.5;
+    // Return true if luminance is greater than threshold (light color)
+    return luminance > COLOR_LUMINANCE_THRESHOLD;
   };
 
   return (
@@ -273,7 +277,7 @@ function ProductDetail() {
               alt={`${product.name} - ${selectedColor}`}
               className="w-full max-w-2xl h-[400px] sm:h-[450px] md:h-[500px] object-contain hover:scale-105 transition-transform duration-300"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/vite.svg';
+                (e.target as HTMLImageElement).src = IMAGE_FALLBACK;
               }}
             />
           </div>
@@ -283,7 +287,7 @@ function ProductDetail() {
             {/* Color Selection */}
             <div>
               <p className="text-sm font-semibold mb-2 text-gray-700 flex items-center gap-2">
-                Select Color: 
+                {UI_MESSAGES.PRODUCT.SELECT_COLOR}
                 
               </p>
               <div className="flex flex-wrap gap-3">
@@ -345,7 +349,7 @@ function ProductDetail() {
             <div className="mb-3">
               <div className="flex items-baseline gap-2 mb-1">
                 <p className="text-3xl sm:text-4xl font-bold text-green-700">
-                  ₹{currentVariant.price.toLocaleString('en-IN')}
+                  ₹{currentVariant.price.toLocaleString(LOCALE)}
                 </p>
                 {discountPercent > 0 && (
                   <span className="text-sm text-green-600 font-semibold">
@@ -355,17 +359,17 @@ function ProductDetail() {
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-gray-500 line-through">
-                  MRP: ₹{currentVariant.mrp.toLocaleString('en-IN')}
+                  MRP: ₹{currentVariant.mrp.toLocaleString(LOCALE)}
                 </p>
                 {!currentVariant.inStock && (
-                  <span className="text-xs text-red-600 font-semibold">Out of Stock</span>
+                  <span className="text-xs text-red-600 font-semibold">{UI_MESSAGES.PRODUCT.OUT_OF_STOCK}</span>
                 )}
               </div>
             </div>
             <div>
-              <p className="text-sm text-gray-700">EMI Plans backed by Mutual Funds</p>
-              <p className="text-xs text-gray-500 mt-1">
-                Select a plan to proceed with easy monthly payments
+              <p className="text-sm text-gray-700">{UI_MESSAGES.PRODUCT.EMI_BACKED_BY_MF}</p>
+              <p className="text-xs text-gray-500">
+                {UI_MESSAGES.PRODUCT.SELECT_PLAN_TEXT}
               </p>
             </div>
           </div>
@@ -391,10 +395,10 @@ function ProductDetail() {
               }`}
             >
               {!currentVariant.inStock
-                ? 'Out of Stock'
+                ? UI_MESSAGES.PRODUCT.OUT_OF_STOCK
                 : !selectedPlan
-                ? 'Select EMI Plan to Proceed'
-                : 'Proceed with Selected Plan'}
+                ? UI_MESSAGES.PRODUCT.SELECT_EMI_TO_PROCEED
+                : UI_MESSAGES.PRODUCT.PROCEED_WITH_PLAN}
             </button>
             {selectedPlan && currentVariant.inStock && (() => {
               const principal = currentVariant.price - selectedPlan.cashback;
@@ -403,7 +407,7 @@ function ProductDetail() {
               if (selectedPlan.interestRate === 0) {
                 monthlyPayment = Math.ceil(principal / selectedPlan.tenureMonths);
               } else {
-                const monthlyInterestRate = selectedPlan.interestRate / 100 / 12;
+                const monthlyInterestRate = selectedPlan.interestRate / PERCENTAGE_DIVISOR / MONTHS_PER_YEAR;
                 monthlyPayment = Math.ceil(
                   (principal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, selectedPlan.tenureMonths)) /
                   (Math.pow(1 + monthlyInterestRate, selectedPlan.tenureMonths) - 1)
@@ -412,7 +416,7 @@ function ProductDetail() {
               
               return (
                 <p className="text-xs text-center text-gray-600">
-                  You'll pay ₹{monthlyPayment.toLocaleString('en-IN')}/month for {selectedPlan.tenureMonths} months
+                  You'll pay ₹{monthlyPayment.toLocaleString(LOCALE)}/month for {selectedPlan.tenureMonths} months
                 </p>
               );
             })()}
