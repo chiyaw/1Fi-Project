@@ -4,9 +4,15 @@ export const SERVER_NAME = '1Fi Backend API';
 export const API_VERSION = '1.0.0';
 
 // CORS Configuration
+// Read allowed origins from environment variable
+const envOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
+
 export const CORS_ORIGINS = [
   'http://localhost:5173',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  ...envOrigins
 ];
 
 export const CORS_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'];

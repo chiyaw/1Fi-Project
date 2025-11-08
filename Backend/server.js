@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import https from 'https';
+import http from 'http';
+import fs from 'fs';
 import connectDB from './config/db.js';
 import productRoutes from './routes/productRoutes.js';
 import detect from "detect-port";
@@ -73,10 +76,40 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  console.log(`API available at http://localhost:${PORT}`);
-});
+// Check if SSL certificates are available for HTTPS
+const useHTTPS = process.env.USE_HTTPS === 'true' && 
+                 process.env.SSL_KEY_PATH && 
+                 process.env.SSL_CERT_PATH;
+
+if (useHTTPS) {
+  try {
+    const httpsOptions = {
+      key: fs.readFileSync(process.env.SSL_KEY_PATH),
+      cert: fs.readFileSync(process.env.SSL_CERT_PATH)
+    };
+
+    https.createServer(httpsOptions, app).listen(PORT, () => {
+      console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+      console.log(`HTTPS API available at https://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start HTTPS server:', error.message);
+    console.log('Falling back to HTTP...');
+    startHTTPServer();
+  }
+} else {
+  startHTTPServer();
+}
+
+function startHTTPServer() {
+  http.createServer(app).listen(PORT, () => {
+    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(`HTTP API available at http://localhost:${PORT}`);
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('⚠️  WARNING: Running in production without HTTPS! Set USE_HTTPS=true and provide SSL certificates.');
+    }
+  });
+}
 
 export default app;
 
