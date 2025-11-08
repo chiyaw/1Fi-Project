@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import type { Product, Variant } from '../types/index';
 import { getProductById } from '../services/api';
 import EMIPlanSelector from './EMIPlanSelector';
@@ -14,6 +14,7 @@ interface EMIPlan {
 function ProductDetail() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedStorage, setSelectedStorage] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
@@ -45,6 +46,10 @@ function ProductDetail() {
         
         setProduct(data);
 
+        // Get query parameters from URL
+        const urlColor = searchParams.get('color');
+        const urlStorage = searchParams.get('storage');
+
         // Set default variant with better defensive checks
         // Handle both string and array formats for defaultVariant.storage
         const defaultStorage = Array.isArray(data.defaultVariant?.storage)
@@ -53,12 +58,24 @@ function ProductDetail() {
         // Get default color from defaultVariant or first variant's color
         const defaultColor = data.defaultVariant?.color || data.variants?.[0]?.color;
         
-        setSelectedStorage(defaultStorage);
-        setSelectedColor(defaultColor);
+        // Use URL params if available, otherwise use defaults
+        let initialStorage = defaultStorage;
+        let initialColor = defaultColor;
 
-        // Find and set the default variant
+        // Check if URL params are valid
+        if (urlStorage && data.storageOptions.includes(urlStorage)) {
+          initialStorage = urlStorage;
+        }
+        if (urlColor && data.variants.some(v => v.color === urlColor)) {
+          initialColor = urlColor;
+        }
+
+        setSelectedStorage(initialStorage);
+        setSelectedColor(initialColor);
+
+        // Find and set the variant matching the selected storage and color
         const variant = data.variants?.find(
-          (v) => v.storage && Array.isArray(v.storage) && v.storage.includes(defaultStorage) && v.color === defaultColor
+          (v) => v.storage && Array.isArray(v.storage) && v.storage.includes(initialStorage) && v.color === initialColor
         );
         
         // Always use a fallback variant if primary match fails
@@ -67,12 +84,17 @@ function ProductDetail() {
         if (!variant && data.variants?.[0]) {
           // Update the selected values to match the fallback variant
           if (data.variants[0].storage?.[0]) {
-            setSelectedStorage(data.variants[0].storage[0]);
+            initialStorage = data.variants[0].storage[0];
+            setSelectedStorage(initialStorage);
           }
           if (data.variants[0].color) {
-            setSelectedColor(data.variants[0].color);
+            initialColor = data.variants[0].color;
+            setSelectedColor(initialColor);
           }
         }
+        
+        // Update URL with the actual selected values (either from URL or defaults)
+        setSearchParams({ color: initialColor, storage: initialStorage }, { replace: true });
         
         setCurrentVariant(finalVariant);
         setError(null);
@@ -97,6 +119,9 @@ function ProductDetail() {
       return;
     }
     
+    // Update URL with new query parameters
+    setSearchParams({ color: selectedColor, storage: selectedStorage });
+    
     // Find the variant that matches both storage and color from already-loaded data
     const matchingVariant = product.variants?.find(
       (v) => v.color === selectedColor && 
@@ -114,7 +139,7 @@ function ProductDetail() {
         setCurrentVariant(colorVariant);
       }
     }
-  }, [product, selectedStorage, selectedColor, isInitialLoad]);
+  }, [product, selectedStorage, selectedColor, isInitialLoad, setSearchParams]);
 
   const handleProceed = () => {
     if (!selectedPlan || !currentVariant) {

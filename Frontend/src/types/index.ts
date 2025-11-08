@@ -25,24 +25,3 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
 }
-
-export interface EMIPlan {
-  _id: string;
-  tenureMonths: number;
-  interestRate: number;
-  interestRateDisplay: string;
-  cashback: number;
-  cashbackDisplay: string | null;
-  processingFee: number;
-  featured: boolean;
-  description: string;
-  active: boolean;
-  createdAt: string;
-}
-
-export interface EMICalculation {
-  plan: EMIPlan;
-  monthlyPayment: number;
-  totalAmount: number;
-  savings: number;
-}

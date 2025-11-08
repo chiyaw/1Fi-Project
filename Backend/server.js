@@ -3,7 +3,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import productRoutes from './routes/productRoutes.js';
-import emiRoutes from './routes/emiRoutes.js';
 import detect from "detect-port";
 
 // Load environment variables
@@ -40,14 +39,12 @@ app.get('/', (req, res) => {
     message: '1Fi Backend API',
     version: '1.0.0',
     endpoints: {
-      products: '/api/products',
-      emiPlans: '/api/emi'
+      products: '/api/products'
     }
   });
 });
 
 app.use('/api/products', productRoutes);
-app.use('/api/emi', emiRoutes);
 
 // 404 Handler
 app.use((req, res) => {
