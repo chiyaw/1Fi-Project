@@ -1,0 +1,154 @@
+[{
+  "_id": {
+    "$oid": "690df6ad9c1d3c3d58ef3508"
+  },
+  "name": "iPhone 17 Pro",
+  "description": "The latest iPhone 17 Pro",
+  "category": "Smartphones",
+  "brand": "Apple",
+  "storageOptions": [
+    "128GB",
+    "256GB",
+    "512GB"
+  ],
+  "colorOptions": [
+    "#e97638",
+    "#273851",
+    "#c7c9cb"
+  ],
+  "variants": [
+    {
+      "storage": [
+        "128GB",
+        "256GB",
+        "512GB"
+      ],
+      "color": "#e97638",
+      "mrp": 134900,
+      "price": 129900,
+      "imageUrl": "https://res.cloudinary.com/db3ksjj2j/image/upload/v1762592120/orange_iphone-removebg-preview_hr2pc9.png",
+      "inStock": true
+    },
+    {
+      "storage": [
+        "128GB",
+        "256GB",
+        "512GB"
+      ],
+      "color": "#273851",
+      "mrp": 134900,
+      "price": 129900,
+      "imageUrl": "https://res.cloudinary.com/db3ksjj2j/image/upload/v1762592210/iPhone_17_Pro-removebg-preview_1_axeo1i.png",
+      "inStock": true
+    },
+    {
+      "storage": [
+        "128GB",
+        "265GB",
+        "512GB"
+      ],
+      "color": "#c7c9cb",
+      "mrp": 134900,
+      "price": 129900,
+      "imageUrl": "https://res.cloudinary.com/db3ksjj2j/image/upload/v1762592312/iphone_silver-removebg-preview_oevmvf.png",
+      "inStock": false
+    }
+  ],
+  "defaultVariant": {
+    "storage": "128GB",
+    "color": "Black"
+  },
+  "featured": true
+},
+{
+  "_id": {
+    "$oid": "690df6ad9c1d3c3d58ef3509"
+  },
+  "name": "Samsung Galaxy S25 Ultra",
+  "description": "The latest Smartphone of Samsung Galaxy",
+  "category": "Smartphones",
+  "brand": "Samsung",
+  "storageOptions": [
+    "128GB",
+    "256GB"
+  ],
+  "colorOptions": [
+    "#e3e3e5",
+    "#ddeade"
+  ],
+  "variants": [
+    {
+      "storage": [
+        "128GB",
+        "256GB"
+      ],
+      "color": "#e3e3e5",
+      "mrp": 89999,
+      "price": 45999,
+      "imageUrl": "https://res.cloudinary.com/db3ksjj2j/image/upload/v1762593017/Samsung_Galaxy_S25_Ultra___12GB___512GB___5G___Titanium_White_Silver-removebg-preview_updpju.png",
+      "inStock": true
+    },
+    {
+      "storage": [
+        "128GB",
+        "256GB"
+      ],
+      "color": "#ddeade",
+      "mrp": 89999,
+      "price": 45999,
+      "imageUrl": "https://res.cloudinary.com/db3ksjj2j/image/upload/v1762593060/Samsung_Galaxy_S25_128GB__Unlocked__Mint_SM-S931ULGAXAA-removebg-preview_r02u3u.png",
+      "inStock": true
+    }
+  ],
+  "defaultVariant": {
+    "storage": "128GB",
+    "color": "Phantom Black"
+  },
+  "featured": false
+},
+{
+  "_id": {
+    "$oid": "690df6ad9c1d3c3d58ef350a"
+  },
+  "name": "OnePlus Nord 5",
+  "description": "High-performance smartphone with Hasselblad camera system and fast charging.",
+  "category": "Smartphones",
+  "brand": "OnePlus",
+  "storageOptions": [
+    "128GB",
+    "256GB"
+  ],
+  "colorOptions": [
+    "#e1dfde",
+    "#c8d5e5"
+  ],
+  "variants": [
+    {
+      "storage": [
+        "128GB",
+        "256GB"
+      ],
+      "color": "#e1dfde",
+      "mrp": 44999,
+      "price": 37940,
+      "imageUrl": "https://res.cloudinary.com/db3ksjj2j/image/upload/v1762593453/BIG_W_Market___BIG_W-removebg-preview_wnzrbc.png",
+      "inStock": true
+    },
+    {
+      "storage": [
+        "128GB",
+        "256GB"
+      ],
+      "color": "#c8d5e5",
+      "mrp": 44999,
+      "price": 37940,
+      "imageUrl": "https://res.cloudinary.com/db3ksjj2j/image/upload/v1762593487/OnePlus_Nord_5_5G_Dual_Sim_12GB_RAM_512GB_-_Dry_Ice_-_Tech_2_Tech-removebg-preview_qiyvm5.png",
+      "inStock": false
+    }
+  ],
+  "defaultVariant": {
+    "storage": "128GB",
+    "color": "Green"
+  },
+  "featured": true
+}]
