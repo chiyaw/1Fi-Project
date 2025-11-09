@@ -307,13 +307,90 @@ All endpoints follow a consistent error format:
 - `maxPrice`: Maximum price across all variants
 - `hasStock`: Whether any variant is in stock
 
+### 📦 Seed Data (seedData.json)
+
+The project includes pre-configured seed data located at `/Backend/config/seedData.json` containing 3 smartphone products with complete variant information.
+
+**Seed Data Structure:**
+
+The `seedData.json` file contains an array of product documents that can be imported directly into MongoDB. Each document follows the exact schema structure defined above.
+
+**Sample Product from seedData.json:**
+
+```json
+{
+  "_id": { "$oid": "690df6ad9c1d3c3d58ef3508" },
+  "name": "iPhone 17 Pro",
+  "description": "The latest iPhone 17 Pro",
+  "category": "Smartphones",
+  "brand": "Apple",
+  "storageOptions": ["128GB", "256GB", "512GB"],
+  "colorOptions": ["#e97638", "#273851", "#c7c9cb"],
+  "variants": [
+    {
+      "storage": ["128GB", "256GB", "512GB"],
+      "color": "#e97638",
+      "mrp": 134900,
+      "price": 129900,
+      "imageUrl": "https://res.cloudinary.com/.../orange_iphone.png",
+      "inStock": true
+    }
+  ],
+  "defaultVariant": {
+    "storage": "128GB",
+    "color": "Black"
+  },
+  "featured": true
+}
+```
+
+**Included Products:**
+1. **iPhone 17 Pro** (Apple)
+   - 3 color variants: Orange (#e97638), Dark Blue (#273851), Silver (#c7c9cb)
+   - Storage: 128GB, 256GB, 512GB
+   - Price: ₹129,900 (MRP: ₹134,900)
+
+2. **Samsung Galaxy S25 Ultra** (Samsung)
+   - 2 color variants: White Silver (#e3e3e5), Mint (#ddeade)
+   - Storage: 128GB, 256GB
+   - Price: ₹45,999 (MRP: ₹89,999)
+
+3. **OnePlus Nord 5** (OnePlus)
+   - 2 color variants: Beige (#e1dfde), Blue (#c8d5e5)
+   - Storage: 128GB, 256GB
+   - Price: ₹37,940 (MRP: ₹44,999)
+
+**Key Features of Seed Data:**
+- All product images hosted on Cloudinary CDN
+- Multiple variants per product with different colors and storage options
+- Realistic pricing with MRP and discounted prices
+- Stock availability flags for each variant
+- Featured product flags for homepage display
+- MongoDB ObjectId format for _id fields
+
+**Importing Seed Data:**
+
+To import the seed data into your MongoDB database:
+
+```bash
+# Using mongoimport
+mongoimport --uri "your_mongodb_uri" --collection products --file Backend/config/seedData.json --jsonArray
+
+# Or using MongoDB Compass
+# 1. Open MongoDB Compass
+# 2. Connect to your database
+# 3. Select the collection
+# 4. Import > Select seedData.json
+```
+
 ## 📁 Project Structure
 
 ```
 1Fi-Project/
 ├── Backend/
 │   ├── config/
-│   │   └── db.js                 # MongoDB connection configuration
+│   │   ├── db.js                 # MongoDB connection configuration
+│   │   └── seedData.json         # 🌟 Seed data with 3 products & variants
 │   ├── models/
 │   │   ├── index.js              # Model exports
 │   │   └── Product.js            # Product schema and model
