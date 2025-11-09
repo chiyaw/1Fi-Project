@@ -30,12 +30,7 @@ const PORT = await detect(parseInt(process.env.PORT) || DEFAULT_PORT);
 connectDB();
 
 // Middleware
-app.use(cors({
-  origin: CORS_ORIGINS, // Allow frontend origins
-  credentials: true,
-  methods: CORS_METHODS,
-  allowedHeaders: CORS_ALLOWED_HEADERS
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
