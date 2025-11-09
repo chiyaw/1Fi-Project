@@ -37,7 +37,7 @@ function EMIPlanSelector({ productPrice, onSelectPlan, selectedPlan }: EMIPlanSe
   };
 
   return (
-    <div className="flex flex-col gap-2 max-h-[500px] overflow-y-auto pr-1">
+    <div className="flex flex-col gap-2 max-h-[500px] overflow-y-auto pr-1 mt-1">
       {emiPlans.map((plan) => {
         const monthlyPayment = calculateMonthlyPayment(plan);
         const totalAmount = calculateTotalAmount(plan);
@@ -54,7 +54,7 @@ function EMIPlanSelector({ productPrice, onSelectPlan, selectedPlan }: EMIPlanSe
             }`}
           >
             <div className="flex flex-row justify-between items-center mb-1">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-1">
                 <div
                   className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                     isSelected
@@ -63,10 +63,10 @@ function EMIPlanSelector({ productPrice, onSelectPlan, selectedPlan }: EMIPlanSe
                   }`}
                 >
                   {isSelected && (
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                    <div className="w-2 h-2 bg-white rounded-full mt-1"></div>
                   )}
                 </div>
-                <p className="font-medium">₹{monthlyPayment.toLocaleString(LOCALE)} ✕ {plan.tenureMonths} Months</p>
+                <p className="font-medium">₹{monthlyPayment.toLocaleString(LOCALE)} * {plan.tenureMonths} Months</p>
               </div>
               <p className={`text-sm font-semibold ${
                 plan.interestRate === 0 ? 'text-green-600' : 'text-orange-600'
